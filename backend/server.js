@@ -21,7 +21,8 @@ const viewers = {};     // viewerId -> viewer WebSocket
 app.get('/streams', (req, res) => {
   const streamList = Object.values(publishers).map(pub => ({
     publisherId: pub.id,
-    name: pub.name
+    name: pub.name,
+    description: pub.description
   }));
   res.json({ streams: streamList });
 });
@@ -63,6 +64,7 @@ wss.on('connection', (ws) => {
         ws.role = 'publisher';
         ws.id = publisherId;
         ws.name = data.name || "Unnamed Publisher";
+        ws.description = data.description || ""; // Make sure this is included
         publishers[publisherId] = ws;
         console.log(`Publisher joined: ${publisherId} (${ws.name})`);
       } else if (data.role === 'viewer') {

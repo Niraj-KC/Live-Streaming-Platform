@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 // Publisher.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import './style.css';
@@ -124,10 +126,12 @@ const Publisher = () => {
     addLog('Initializing signaling WebSocket for publisher...');
     const signaling = new WebSocket(CONFIG);
     signalingRef.current = signaling;
-
     signaling.onopen = () => {
       addLog('Connected to signaling server as publisher.');
-      signaling.send(JSON.stringify({ type: 'join', role: 'publisher' }));
+      signaling.send(JSON.stringify({
+        type: 'join',
+        role: 'publisher',
+      }));
     };
 
     // Log raw message and handle different signaling messages.
