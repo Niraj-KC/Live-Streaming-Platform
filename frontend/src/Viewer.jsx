@@ -1,7 +1,7 @@
 // src/Viewer.jsx
 import React, { useState, useRef, useEffect } from 'react';
-import './style.css';
 import { useParams } from 'react-router';
+import './Viewer.css';
 
 const CONFIG = import.meta.env.VITE_SIGNALING_SERVER_URL;
 
@@ -144,43 +144,67 @@ const Viewer = () => {
   }, [publisherId]);
 
   return (
-    <div>
-      <nav className="navbar navbar-dark bg-dark">
-        <a className="navbar-brand" href="#">RTMP Viewer</a>
+    <div className="viewer-container">
+      <nav className="viewer-navbar">
+        <div className="viewer-logo">RTMP Viewer</div>
       </nav>
-      <div className="container mt-4">
+  
+      <div className="viewer-hero">
         <h1>Viewing Stream from {publisherId}</h1>
-        <div className="row">
-          <div className="col-md-8 offset-md-2">
-            <div className="card mb-3">
-              <div className="card-header">Live Stream</div>
-              <div className="video-container">
-                <video id="remoteVideo" ref={remoteVideoRef} autoPlay playsInline controls />
-              </div>
+        <p>Join a live stream and watch in real time.</p>
+      </div>
+  
+      {/* Main content: Video and Button side by side */}
+      <div className="viewer-content">
+        <div className="video-section">
+          <div className="card video-card">
+            <div className="card-header">Live Stream</div>
+            <div className="video-container">
+              <video
+                id="remoteVideo"
+                ref={remoteVideoRef}
+                autoPlay
+                playsInline
+                controls
+              />
             </div>
-            <div className="text-center mb-3">
+          </div>
+        </div>
+  
+        <div className="button-section">
+          <div className="card button-card">
+            <div className="card-header">Ready to Join?</div>
+            <div className="card-content">
               <button
-                id="joinStreamBtn"
-                className="btn btn-primary"
+                className="btn join-btn"
                 onClick={joinStream}
                 disabled={isJoined}
               >
                 Join Stream
               </button>
             </div>
-            <div className="card">
-              <div className="card-header">Status Log</div>
-              <div id="log" className="card-body" style={{ height: '200px', overflowY: 'auto' }}>
-                {logMessages.map((msg, index) => (
-                  <div key={index}>{msg}</div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </div>
+  
+      {/* Status Log below */}
+      <div className="log-section">
+        <div className="card log-card">
+          <div className="card-header">Status Log</div>
+          <div className="log-card-body">
+            {logMessages.map((msg, index) => (
+              <div key={index}>{msg}</div>
+            ))}
+          </div>
+        </div>
+      </div>
+  
+      <footer className="viewer-footer">
+        <p>&copy; {new Date().getFullYear()} RTMP Viewer. All rights reserved.</p>
+      </footer>
     </div>
   );
+  
 };
 
 export default Viewer;
