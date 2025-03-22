@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 // Publisher.jsx
 import React, { useState, useRef, useEffect } from 'react';
-import './style.css';
+import './Publisher.css';
 
 const CONFIG = import.meta.env.VITE_SIGNALING_SERVER_URL; // Ensure this is set correctly
 
@@ -242,65 +242,70 @@ const Publisher = () => {
     }
   };
 
-  return (
-    <div>
-      <nav className='navbar navbar-dark bg-dark'>
-        <a className='navbar-brand' href='#'>RTMP Publisher</a>
-      </nav>
-      <div className='container mt-4'>
-        <div className='row'>
-          {/* Video and Controls */}
-          <div className='col-md-8'>
-            <div className='card mb-3'>
-              <div className='card-header'>Live Preview</div>
-              <div className='video-container'>
-                <video id='localVideo' ref={localVideoRef} autoPlay playsInline muted />
-              </div>
-            </div>
-            <div className='mb-3'>
-              <button
-                id='startStreamBtn'
-                className='btn btn-success'
-                onClick={startStream}
-                disabled={isStreaming}
-              >
-                Start Streaming
-              </button>
-              <button
-                id='stopStreamBtn'
-                className='btn btn-danger'
-                onClick={stopStream}
-                disabled={!isStreaming}
-              >
-                Stop Streaming
-              </button>
-            </div>
-          </div>
-          {/* Dashboard: Viewer List & Log */}
-          <div className='col-md-4'>
-            <div className='card mb-3'>
-              <div className='card-header'>Connected Viewers</div>
-              <ul id='viewerList' className='list-group list-group-flush'>
-                {viewers.map(viewer => (
-                  <li key={viewer.viewerId} className='list-group-item'>
-                    ID: {viewer.viewerId} - Name: {viewer.viewerName}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className='card'>
-              <div className='card-header'>Status Log</div>
-              <div id='log' className='card-body' style={{ height: '300px', overflowY: 'auto' }}>
-                {logs.map((msg, index) => (
-                  <div key={index}>{msg}</div>
-                ))}
-              </div>
-            </div>
+  // Replace your current return (...) with:
+
+return (
+  <div className="publisher-container">
+    <nav className="publisher-navbar">
+      <div className="publisher-logo">RTMP Publisher</div>
+    </nav>
+
+    <main className="publisher-hero">
+      {/* Video Section */}
+      <div className="video-section">
+        <div className="card">
+          <div className="card-header">Live Preview</div>
+          <div className="video-container">
+            <video ref={localVideoRef} autoPlay playsInline muted />
           </div>
         </div>
+        <div className="controls">
+          <button className="btn start-btn" onClick={startStream} disabled={isStreaming}>
+            Start Streaming
+          </button>
+          <button className="btn stop-btn" onClick={stopStream} disabled={!isStreaming}>
+            Stop Streaming
+          </button>
+        </div>
       </div>
+
+      {/* Dashboard Section */}
+      <div className="dashboard-section">
+  <div className="dashboard-card">
+    <div className="dashboard-card-header">Connected Viewers</div>
+    <div className="dashboard-card-body">
+      {viewers.length > 0 ? (
+        <ul className="viewer-list">
+          {viewers.map((viewer) => (
+            <li key={viewer.viewerId}>
+              {viewer.viewerId} - {viewer.viewerName}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="no-viewers">No viewers connected</p>
+      )}
     </div>
-  );
+  </div>
+
+  <div className="dashboard-card">
+    <div className="dashboard-card-header">Status Log</div>
+    <div className="dashboard-card-body">
+      {logs.map((msg, index) => (
+        <p key={index} className="log-entry">{msg}</p>
+      ))}
+    </div>
+  </div>
+</div>
+
+    </main>
+
+    <footer className="publisher-footer">
+      <p>&copy; {new Date().getFullYear()} RTMP Publisher. All rights reserved.</p>
+    </footer>
+  </div>
+);
+
 };
 
 export default Publisher;
