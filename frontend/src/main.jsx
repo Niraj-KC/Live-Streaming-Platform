@@ -7,7 +7,7 @@ createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/publisher/:streamId" element={<Publisher />} />
+      <Route path="/publisher/:publisherName" element={<Publisher />} />
       <Route path="/viewer/:publisherId" element={<Viewer />} />
     </Routes>
   </BrowserRouter>

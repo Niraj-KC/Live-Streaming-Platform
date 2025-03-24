@@ -2,17 +2,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router';
 import './Viewer.css';
-
-const CONFIG = import.meta.env.VITE_SIGNALING_SERVER_URL;
+import axios from 'axios';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const Viewer = () => {
   const { publisherId } = useParams();
+  const [publisherName, setPublisherName] = useState("Unknown");
   const remoteVideoRef = useRef(null);
   const [logMessages, setLogMessages] = useState([]);
   const [isJoined, setIsJoined] = useState(false);
   const peerConnectionRef = useRef(null);
   const signalingRef = useRef(null);
-  const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+  const [configuration, setConfiguration] = useState({});
 
   const addLog = (message) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -91,14 +92,22 @@ const Viewer = () => {
 
   const initializeSignaling = (viewerName) => {
     addLog('Initializing WebSocket connection...');
-    signalingRef.current = new WebSocket(CONFIG);
+    signalingRef.current = new WebSocket(import.meta.env.VITE_SIGNALING_SERVER_URL);
+
+
 
     signalingRef.current.onopen = () => {
       addLog('Connected to signaling server as viewer.');
       const joinMessage = { type: 'join', role: 'viewer', name: viewerName };
       if (publisherId !== 'unknown') joinMessage.target = publisherId;
       signalingRef.current.send(JSON.stringify(joinMessage));
+      signalingRef.current.send(JSON.stringify({
+        type: "getPublisherName",
+        publisherId: publisherId
+      }));
+
     };
+
 
     signalingRef.current.onmessage = async (messageEvent) => {
       addLog('Raw signaling message: ' + messageEvent.data);
@@ -108,6 +117,8 @@ const Viewer = () => {
         addLog('Received offer from publisher. Processing...');
         await handleOffer(data.payload);
       } else if (data.type === 'candidate') {
+
+        console.log("#pn: " + signalingRef.current);
         if (peerConnectionRef.current) {
           try {
             await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(data.payload));
@@ -116,6 +127,11 @@ const Viewer = () => {
             addLog('Error adding ICE candidate: ' + err);
           }
         }
+      }
+
+      else if (data.type === "publisherName") {
+        console.log(`Connected to stream: ${data.publisherName}`);
+        setPublisherName(data.publisherName);
       }
     };
 
@@ -137,23 +153,34 @@ const Viewer = () => {
   };
 
   useEffect(() => {
+    const fetchServerConfig = async () => {
+      try {
+        const response = await axios.get(`${SERVER_URL}/ice-config`);
+        setConfiguration(response.data);
+      } catch (error) {
+        console.error('Error fetching server configuration:', error);
+      }
+    };
+    fetchServerConfig();
+
+
     return () => {
       if (signalingRef.current) signalingRef.current.close();
       if (peerConnectionRef.current) peerConnectionRef.current.close();
     };
-  }, [publisherId]);
+  }, [publisherId, publisherName]);
 
   return (
     <div className="viewer-container">
       <nav className="viewer-navbar">
         <div className="viewer-logo">RTMP Viewer</div>
       </nav>
-  
+
       <div className="viewer-hero">
-        <h1>Viewing Stream from {publisherId}</h1>
+        <h1>Viewing Stream from {publisherName} [{publisherId}]</h1>
         <p>Join a live stream and watch in real time.</p>
       </div>
-  
+
       {/* Main content: Video and Button side by side */}
       <div className="viewer-content">
         <div className="video-section">
@@ -170,7 +197,7 @@ const Viewer = () => {
             </div>
           </div>
         </div>
-  
+
         <div className="button-section">
           <div className="card button-card">
             <div className="card-header">Ready to Join?</div>
@@ -186,7 +213,7 @@ const Viewer = () => {
           </div>
         </div>
       </div>
-  
+
       {/* Status Log below */}
       <div className="log-section">
         <div className="card log-card">
@@ -198,13 +225,13 @@ const Viewer = () => {
           </div>
         </div>
       </div>
-  
+
       <footer className="viewer-footer">
         <p>&copy; {new Date().getFullYear()} RTMP Viewer. All rights reserved.</p>
       </footer>
     </div>
   );
-  
+
 };
 
 export default Viewer;

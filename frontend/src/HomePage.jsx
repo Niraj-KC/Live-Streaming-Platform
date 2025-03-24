@@ -11,8 +11,8 @@ const HomePage = () => {
     const navigate = useNavigate();
 
     const startStream = () => {
-        const streamId = `stream-${Date.now()}`;
-        navigate(`/publisher/${streamId}`);
+        const publisherName = prompt('Please enter your name:', 'Publisher');
+        navigate(`/publisher/${publisherName}`);
     };
 
     useEffect(() => {
@@ -20,6 +20,7 @@ const HomePage = () => {
             try {
                 const response = await axios.get(`${SERVER_URL}/streams`);
                 setStreams(response.data.streams);
+                console.log(streams);
             } catch (error) {
                 console.error('Error fetching streams:', error);
             }
@@ -32,7 +33,8 @@ const HomePage = () => {
     };
 
     const filteredStreams = streams.filter((stream) =>
-        stream.publisherId.toLowerCase().includes(searchTerm.toLowerCase())
+    (stream.publisherId.toLowerCase().includes(searchTerm.toLowerCase())
+        || stream.name.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     return (
@@ -83,8 +85,9 @@ const HomePage = () => {
                         {filteredStreams.map((stream) => (
                             <div key={stream.publisherId} className="stream-card">
                                 <div className="stream-info">
-                                    <h3>Stream ID: {stream.publisherId}</h3>
-                                     {/* Display the description if available */}
+
+                                    <h3>Stream {stream.name} ({stream.publisherId})</h3>
+                                    {/* Display the description if available */}
                                     {stream.description && (
                                         <p className="stream-description">{stream.description}</p>
                                     )}

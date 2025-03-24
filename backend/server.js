@@ -17,14 +17,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 const publishers = {};  // publisherId -> publisher WebSocket
 const viewers = {};     // viewerId -> viewer WebSocket
 
-// REST endpoint: return active streams (publishers)
-app.get('/streams', (req, res) => {
-  const streamList = Object.values(publishers).map(pub => ({
-    publisherId: pub.id,
-    name: pub.name,
-  }));
-  res.json({ streams: streamList });
-});
+
+
+
 
 // Read SSL key and certificate.
 const serverOptions = {
@@ -45,6 +40,30 @@ const wss = new WebSocket.Server({ server: httpsServer, path: SIGNALING_SERVER_P
 function generateId() {
   return Math.random().toString(36).substring(2, 10);
 }
+
+// REST endpoint: return active streams (publishers)
+app.get('/streams', (req, res) => {
+  const streamList = Object.values(publishers).map(pub => ({
+    publisherId: pub.id,
+    name: pub.name,
+  }));
+  res.json({ streams: streamList });
+});
+
+// Endpoint to provide ICE server configuration
+app.get('/ice-config', (req, res) => {
+  res.json({
+    iceServers: [
+      { urls: process.env.STUN_SERVER },
+      {
+        urls: process.env.TURN_SERVER,
+        username: process.env.TURN_USERNAME,
+        credential: process.env.TURN_CREDENTIAL
+      }
+    ]
+  });
+});
+
 
 wss.on('connection', (ws) => {
   ws.on('message', (message) => {
@@ -119,8 +138,20 @@ wss.on('connection', (ws) => {
           console.warn(`Target publisher ${data.target} not found for ${data.type} message.`);
         }
       }
+      
+      else if (data.type === "getPublisherName") {
+        if (publishers[data.publisherId]) {
+            ws.send(JSON.stringify({
+                type: "publisherName",
+                publisherId: data.publisherId,
+                publisherName: publishers[data.publisherId].ws.name
+            }));
+        }
+    }
     }
   });
+
+  
 
   ws.on('close', () => {
     if (ws.role === 'publisher') {
@@ -143,5 +174,9 @@ wss.on('connection', (ws) => {
     }
   });
 });
+
+
+
+
 
 console.log('Secure signaling server with Express is running.');

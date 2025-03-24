@@ -3,10 +3,15 @@
 // Publisher.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import './Publisher.css';
+import axios from 'axios';
 
-const CONFIG = import.meta.env.VITE_SIGNALING_SERVER_URL; // Ensure this is set correctly
+import { useParams } from 'react-router';
+
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const Publisher = () => {
+  const { publisherName } = useParams();
+
   // Refs for local video, stream, peer connections, candidate queues, and signaling
   const localVideoRef = useRef(null);
   const localStreamRef = useRef(null);
@@ -18,9 +23,7 @@ const Publisher = () => {
   const [logs, setLogs] = useState([]);
   const [viewers, setViewers] = useState([]);
   const [isStreaming, setIsStreaming] = useState(false);
-
-  // RTCPeerConnection configuration
-  const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+  const [configuration, setConfiguration] = useState({});
 
   // Helper: Append log messages with a timestamp.
   const addLog = (msg) => {
@@ -123,14 +126,26 @@ const Publisher = () => {
 
   // Set up the signaling WebSocket when the component mounts.
   useEffect(() => {
+    const fetchServerConfig = async () => {
+      try {
+        const response = await axios.get(`${SERVER_URL}/ice-config`);
+        setConfiguration(response.data);
+      } catch (error) {
+        console.error('Error fetching server configuration:', error);
+      }
+    };
+    fetchServerConfig();
+
+
     addLog('Initializing signaling WebSocket for publisher...');
-    const signaling = new WebSocket(CONFIG);
+    const signaling = new WebSocket(import.meta.env.VITE_SIGNALING_SERVER_URL);
     signalingRef.current = signaling;
     signaling.onopen = () => {
       addLog('Connected to signaling server as publisher.');
       signaling.send(JSON.stringify({
         type: 'join',
         role: 'publisher',
+        name: publisherName,
       }));
     };
 
@@ -244,67 +259,67 @@ const Publisher = () => {
 
   // Replace your current return (...) with:
 
-return (
-  <div className="publisher-container">
-    <nav className="publisher-navbar">
-      <div className="publisher-logo">RTMP Publisher</div>
-    </nav>
+  return (
+    <div className="publisher-container">
+      <nav className="publisher-navbar">
+        <div className="publisher-logo">RTMP Publisher</div>
+      </nav>
 
-    <main className="publisher-hero">
-      {/* Video Section */}
-      <div className="video-section">
-        <div className="card">
-          <div className="card-header">Live Preview</div>
-          <div className="video-container">
-            <video ref={localVideoRef} autoPlay playsInline muted />
+      <main className="publisher-hero">
+        {/* Video Section */}
+        <div className="video-section">
+          <div className="card">
+            <div className="card-header">Live Preview</div>
+            <div className="video-container">
+              <video ref={localVideoRef} autoPlay playsInline muted />
+            </div>
+          </div>
+          <div className="controls">
+            <button className="btn start-btn" onClick={startStream} disabled={isStreaming}>
+              Start Streaming
+            </button>
+            <button className="btn stop-btn" onClick={stopStream} disabled={!isStreaming}>
+              Stop Streaming
+            </button>
           </div>
         </div>
-        <div className="controls">
-          <button className="btn start-btn" onClick={startStream} disabled={isStreaming}>
-            Start Streaming
-          </button>
-          <button className="btn stop-btn" onClick={stopStream} disabled={!isStreaming}>
-            Stop Streaming
-          </button>
+
+        {/* Dashboard Section */}
+        <div className="dashboard-section">
+          <div className="dashboard-card">
+            <div className="dashboard-card-header">Connected Viewers</div>
+            <div className="dashboard-card-body">
+              {viewers.length > 0 ? (
+                <ul className="viewer-list">
+                  {viewers.map((viewer) => (
+                    <li key={viewer.viewerId}>
+                      {viewer.viewerId} - {viewer.viewerName}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="no-viewers">No viewers connected</p>
+              )}
+            </div>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="dashboard-card-header">Status Log</div>
+            <div className="dashboard-card-body">
+              {logs.map((msg, index) => (
+                <p key={index} className="log-entry">{msg}</p>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Dashboard Section */}
-      <div className="dashboard-section">
-  <div className="dashboard-card">
-    <div className="dashboard-card-header">Connected Viewers</div>
-    <div className="dashboard-card-body">
-      {viewers.length > 0 ? (
-        <ul className="viewer-list">
-          {viewers.map((viewer) => (
-            <li key={viewer.viewerId}>
-              {viewer.viewerId} - {viewer.viewerName}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="no-viewers">No viewers connected</p>
-      )}
+      </main>
+
+      <footer className="publisher-footer">
+        <p>&copy; {new Date().getFullYear()} RTMP Publisher. All rights reserved.</p>
+      </footer>
     </div>
-  </div>
-
-  <div className="dashboard-card">
-    <div className="dashboard-card-header">Status Log</div>
-    <div className="dashboard-card-body">
-      {logs.map((msg, index) => (
-        <p key={index} className="log-entry">{msg}</p>
-      ))}
-    </div>
-  </div>
-</div>
-
-    </main>
-
-    <footer className="publisher-footer">
-      <p>&copy; {new Date().getFullYear()} RTMP Publisher. All rights reserved.</p>
-    </footer>
-  </div>
-);
+  );
 
 };
 
