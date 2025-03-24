@@ -18,7 +18,13 @@ const publishers = {};  // publisherId -> publisher WebSocket
 const viewers = {};     // viewerId -> viewer WebSocket
 
 
+// Serve static files from the 'dist' directory
+app.use(express.static(path.join(__dirname, 'dist')));
 
+// Route to serve the homepage (index.html)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 
 // Read SSL key and certificate.
@@ -52,7 +58,7 @@ app.get('/streams', (req, res) => {
 
 // Endpoint to provide ICE server configuration
 app.get('/ice-config', (req, res) => {
-  res.json({
+  const ice = {
     iceServers: [
       { urls: process.env.STUN_SERVER },
       {
@@ -61,7 +67,9 @@ app.get('/ice-config', (req, res) => {
         credential: process.env.TURN_CREDENTIAL
       }
     ]
-  });
+  }
+  console.log(ice);
+  res.json(ice);
 });
 
 

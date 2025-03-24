@@ -1,0 +1,28 @@
+# Ignore node_modules - they will be installed inside the container
+node_modules
+
+# Ignore build output if not needed for the final image (adjust folder name if necessary)
+build
+
+# Ignore logs and temporary files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore local environment files (you can copy these separately if needed)
+.env
+.env.local
+.env.*.local
+
+# Ignore operating system files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE files and directories
+.vscode
+.idea
+
+# Ignore git metadata
+.git
+.gitignore
