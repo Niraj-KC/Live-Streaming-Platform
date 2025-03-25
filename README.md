@@ -12,6 +12,25 @@ Make sure you have the following installed:
 
 ## Installation and Running the Project
 
+### Building the Frontend
+
+```sh
+cd .\frontend\
+npm run build
+```
+
+### move the build to backend
+
+```sh
+copy .\frontend\dist\* .\backend\d
+```
+
+### Building the Docker container
+
+```sh
+docker build -f backend/Dockerfile -t live-streaming-app .
+```
+
 ### Setting-up Docket container
 
 ```sh
@@ -19,6 +38,21 @@ docker run -d --name coturn -p 3478:3478 -p 3478:3478/udp -e TURN_REALM=192.168.
 
 docker run -d -p 8443:8443 -e SIGNALLING_SERVER_HOST=192.168.214.248 -e SIGNALLING_SERVER_PORT=8443 -e SIGNALLING_SERVER_PATH=/ws -e STUN_SERVER=stun:stun.l.google.com:19302 -e TURN_SERVER=turn:192.168.214.248:3478 -e TURN_USERNAME=user -e TURN_CREDENTIAL=password --name live-streaming-app live-streaming-app
 ```
+
+### For existing container
+
+```sh
+docker start coturn live-streaming-app
+docker stop coturn live-streaming-app
+```
+
+### For viewing the logs of container
+
+```sh
+docker logs live-streaming-app
+```
+
+OR
 
 ### Backend
 
