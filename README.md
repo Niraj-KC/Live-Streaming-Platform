@@ -8,7 +8,7 @@ Make sure you have the following installed:
 
 - [Node.js](https://nodejs.org/)
 - [npm](https://www.npmjs.com/)
-- [Docker]()
+- [Docker](https://docs.docker.com/desktop/)
 
 ## Installation and Running the Project
 
