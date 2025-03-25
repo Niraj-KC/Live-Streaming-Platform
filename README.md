@@ -19,10 +19,9 @@ cd .\frontend\
 npm run build
 ```
 
-### move the build to backend
-
+### Copy the build to backend
 ```sh
-copy .\frontend\dist\* .\backend\d
+copy .\frontend\dist\* .\backend\dist
 ```
 
 ### Building the Docker container
@@ -34,9 +33,9 @@ docker build -f backend/Dockerfile -t live-streaming-app .
 ### Setting-up Docket container
 
 ```sh
-docker run -d --name coturn -p 3478:3478 -p 3478:3478/udp -e TURN_REALM=192.168.214.248 -e TURN_USER=user:password instrumentisto/coturn
+docker run -d --name coturn -p 3478:3478 -p 3478:3478/udp -e TURN_REALM=[YourIP] -e TURN_USER=user:password instrumentisto/coturn
 
-docker run -d -p 8443:8443 -e SIGNALLING_SERVER_HOST=192.168.214.248 -e SIGNALLING_SERVER_PORT=8443 -e SIGNALLING_SERVER_PATH=/ws -e STUN_SERVER=stun:stun.l.google.com:19302 -e TURN_SERVER=turn:192.168.214.248:3478 -e TURN_USERNAME=user -e TURN_CREDENTIAL=password --name live-streaming-app live-streaming-app
+docker run -d -p 8443:8443 -e SIGNALLING_SERVER_HOST=[YourIP] -e SIGNALLING_SERVER_PORT=8443 -e SIGNALLING_SERVER_PATH=/ws -e STUN_SERVER=stun:stun.l.google.com:19302 -e TURN_SERVER=turn:[YourIP]:3478 -e TURN_USERNAME=user -e TURN_CREDENTIAL=password --name live-streaming-app live-streaming-app
 ```
 
 ### For existing container
