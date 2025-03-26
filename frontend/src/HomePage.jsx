@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './HomePage.css';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
+const SERVER_URL = process.env.VITE_SERVER_URL;
 
 const HomePage = () => {
     const [streams, setStreams] = useState([]);

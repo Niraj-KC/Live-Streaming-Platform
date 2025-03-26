@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router';
 import './Viewer.css';
 import axios from 'axios';
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+const SERVER_URL = process.env.VITE_SERVER_URL;
 
 const Viewer = () => {
   const { publisherId } = useParams();
