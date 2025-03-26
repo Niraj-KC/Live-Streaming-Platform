@@ -153,13 +153,13 @@
   
   /* Each Card (Viewers & Logs) */
   .dashboard-card {
-    flex: 1;                     /* Each card expands equally */
-    display: flex;
-    flex-direction: column;
-    background-color: #f9fafb;   /* Subtle background inside each card */
+    width: 100%;
+    max-width: 600px;
+    background-color: #f9fafb;
     border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 1rem auto;
   }
   
   /* Card Header */
@@ -174,12 +174,11 @@
   
   /* Card Body */
   .dashboard-card-body {
+    height: 200px;
+    overflow-y: auto;
     padding: 1rem;
-    flex: 1;                     /* Let the body grow/shrink */
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    overflow-y: auto;            /* If content is long, scroll within card */
+    font-size: 0.95rem;
+    color: #374151;            /* If content is long, scroll within card */
   }
   
   /* Viewer List Styling */
