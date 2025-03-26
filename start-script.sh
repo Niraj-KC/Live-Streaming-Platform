@@ -2,7 +2,7 @@
 set -e  # Exit immediately if a command exits with a non-zero status
 
 # Prompt the user for the public IP address
-read -p "Enter the public IP for EC2 Instance: " EC2_PUBLIC_IP
+EC2_PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 
 # Validate input
 if [ -z "$EC2_PUBLIC_IP" ]; then
