@@ -138,7 +138,7 @@ const Publisher = () => {
 
 
     addLog('Initializing signaling WebSocket for publisher...');
-    const signaling = new WebSocket(process.env.VITE_SIGNALING_SERVER_URL);
+    const signaling = new WebSocket(import.meta.env.VITE_SIGNALING_SERVER_URL);
     signalingRef.current = signaling;
     signaling.onopen = () => {
       addLog('Connected to signaling server as publisher.');
