@@ -20,7 +20,7 @@ const HomePage = () => {
         const fetchStreams = async () => {
             try {
                 const response = await axios.get(`${SERVER_URL}/streams`);
-                setStreams(response.data.streams || []);
+                setStreams(response.data.streams);
                 console.log(streams);
             } catch (error) {
                 console.error('Error fetching streams:', error);
