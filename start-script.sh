@@ -3,6 +3,7 @@ set -e  # Exit immediately if a command exits with a non-zero status
 
 # Prompt the user for the public IP address
 EC2_PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
+# EC2_PUBLIC_IP=127.0.0.1
 
 # Validate input
 if [ -z "$EC2_PUBLIC_IP" ]; then
@@ -12,6 +13,7 @@ fi
 
 # Define the absolute path
 PROJECT_DIR="/home/ec2-user/Live-Streaming-Platform"
+# PROJECT_DIR="D:\College\Sem-6\CC\Assignment\Live-Streaming-Platfrom"
 
 # Configure frontend .env file
 cd "$PROJECT_DIR/frontend" || { echo "Failed to change directory to frontend"; exit 1; }
@@ -51,3 +53,4 @@ cp -r ./dist "$PROJECT_DIR/backend/" || { echo "Copying dist failed"; exit 1; }
 echo "Running server.js"
 cd "$PROJECT_DIR/backend" || { echo "Failed to change directory to backend"; exit 1; }
 node ./server.js
+ECHO is on.
