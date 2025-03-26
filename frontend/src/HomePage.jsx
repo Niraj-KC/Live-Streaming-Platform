@@ -19,6 +19,7 @@ const HomePage = () => {
     useEffect(() => {
         const fetchStreams = async () => {
             try {
+                console.log(`${SERVER_URL}/streams`);
                 const response = await axios.get(`${SERVER_URL}/streams`);
                 setStreams(response.data.streams);
                 console.log(streams);
