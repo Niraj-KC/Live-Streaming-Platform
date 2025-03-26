@@ -6,7 +6,7 @@ import fs from 'fs';
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: '192.168.214.248',  // Change this to your IP
+    host: '192.168.238.248',  // Change this to your IP
     port: 3000,             // Change port if needed
     https: {
       key: fs.readFileSync('./certs/key.pem'),  // Private key file
