@@ -7,7 +7,7 @@ import axios from 'axios';
 
 import { useParams } from 'react-router';
 
-const SERVER_URL = process.env.VITE_SERVER_URL;
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const Publisher = () => {
   const { publisherName } = useParams();
