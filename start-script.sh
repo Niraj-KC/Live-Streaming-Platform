@@ -10,8 +10,11 @@ if [ -z "$EC2_PUBLIC_IP" ]; then
     exit 1
 fi
 
+# Define the absolute path
+PROJECT_DIR="/home/ec2-user/Live-Streaming-Platform"
+
 # Configure frontend .env file
-cd ./frontend || { echo "Failed to change directory to frontend"; exit 1; }
+cd "$PROJECT_DIR/frontend" || { echo "Failed to change directory to frontend"; exit 1; }
 
 cat > .env <<EOF
 VITE_SIGNALING_SERVER_URL=wss://$EC2_PUBLIC_IP:8443/ws
@@ -21,7 +24,7 @@ EOF
 echo "Frontend .env file created successfully."
 
 # Configure backend .env file
-cd ../backend || { echo "Failed to change directory to backend"; exit 1; }
+cd "$PROJECT_DIR/backend" || { echo "Failed to change directory to backend"; exit 1; }
 
 cat > .env <<EOF
 SIGNALLING_SERVER_HOST=$EC2_PUBLIC_IP
@@ -37,14 +40,14 @@ EOF
 echo "Backend .env file created successfully."
 
 # Build the frontend and copy the dist folder to backend
-cd ../frontend || { echo "Failed to change directory back to frontend"; exit 1; }
+cd "$PROJECT_DIR/frontend" || { echo "Failed to change directory back to frontend"; exit 1; }
 echo "Running npm build"
 npm run build || { echo "npm build failed"; exit 1; }
 
 echo "Copying dist to backend"
-cp -r ./dist ../backend/ || { echo "Copying dist failed"; exit 1; }
+cp -r ./dist "$PROJECT_DIR/backend/" || { echo "Copying dist failed"; exit 1; }
 
 # Run the server
 echo "Running server.js"
-cd ../backend || { echo "Failed to change directory to backend"; exit 1; }
+cd "$PROJECT_DIR/backend" || { echo "Failed to change directory to backend"; exit 1; }
 node ./server.js
