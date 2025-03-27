@@ -1,9 +1,10 @@
 #!/bin/bash
+source /home/ec2-user/.nvm/nvm.sh 
 set -e  # Exit immediately if a command exits with a non-zero status
 
 # Prompt the user for the public IP address
 EC2_PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
-# EC2_PUBLIC_IP=127.0.0.1
+# EC2_PUBLIC_IP=192.168.238.248
 
 # Validate input
 if [ -z "$EC2_PUBLIC_IP" ]; then
@@ -49,8 +50,42 @@ npm run build || { echo "npm build failed"; exit 1; }
 echo "Copying dist to backend"
 cp -r ./dist "$PROJECT_DIR/backend/" || { echo "Copying dist failed"; exit 1; }
 
+
+# Check if Docker daemon is running
+if ! sudo systemctl is-active --quiet docker; then
+    echo "Starting Docker daemon..."
+    sudo systemctl start docker
+    sleep 5  # Wait for Docker to start
+fi
+
+# Check if a container named 'coturn' exists (running or stopped)
+if sudo docker ps -a --format '{{.Names}}' | grep -q "^coturn$"; then
+    # Check if the 'coturn' container is running
+    if sudo docker ps --format '{{.Names}}' | grep -q "^coturn$"; then
+        echo "Coturn server is already running."
+    else
+        echo "Starting existing coturn container..."
+        sudo docker start coturn
+        if [ $? -ne 0 ]; then
+            echo "Error: Failed to start existing coturn container."
+            exit 1
+        fi
+    fi
+else
+    echo "Creating and starting new coturn container..."
+    sudo docker run -d --name coturn -p 3478:3478 -p 3478:3478/udp \
+        -e TURN_REALM=$EC2_PUBLIC_IP -e TURN_USER=user:password \
+        instrumentisto/coturn
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to create and start new coturn container."
+        exit 1
+    fi
+fi
+
+
 # Run the server
 echo "Running server.js"
 cd "$PROJECT_DIR/backend" || { echo "Failed to change directory to backend"; exit 1; }
 node ./server.js
-ECHO is on.
+
+``

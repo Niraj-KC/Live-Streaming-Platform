@@ -156,6 +156,7 @@ const Viewer = () => {
     const fetchServerConfig = async () => {
       try {
         const response = await axios.get(`${SERVER_URL}/ice-config`);
+        console.log("Ice-config" + response);
         setConfiguration(response.data);
       } catch (error) {
         console.error('Error fetching server configuration:', error);
